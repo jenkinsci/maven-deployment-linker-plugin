@@ -5,6 +5,7 @@
   <artifactId>maven-deployment-linker</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>hpi</packaging>
+  <url>http://wiki.hudson-ci.org/display/HUDSON/Maven+Deployment+Linker</url>
   <parent>
     <groupId>org.jvnet.hudson.plugins</groupId>
     <artifactId>plugin</artifactId>
