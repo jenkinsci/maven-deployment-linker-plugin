@@ -41,7 +41,7 @@ public class MavenDeploymentLinkerRecorder extends Recorder {
         while ((line = in.readLine()) != null) {
             Matcher matcher = pattern.matcher(line);
             if (matcher.matches()) {
-                matches.add(matcher.group());
+                matches.add(matcher.group(1));
             }
         }
         if (matches.size() > 0) {
