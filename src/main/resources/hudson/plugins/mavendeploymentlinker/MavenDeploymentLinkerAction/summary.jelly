@@ -1,6 +1,6 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-  <t:summary icon="${it.iconFileName}">
-    ${it.displayName}
+  <t:summary icon="package.gif">
+    Maven Deployments:
     ${it.text}
   </t:summary>
 </j:jelly>

@@ -7,11 +7,11 @@ public class MavenDeploymentLinkerAction implements Action {
     private final StringBuilder textBuilder = new StringBuilder();
 
     public String getIconFileName() {
-        return "package.gif";
+        return null;
     }
 
     public String getDisplayName() {
-        return "Maven Deployments";
+        return null;
     }
 
     public String getUrlName() {
