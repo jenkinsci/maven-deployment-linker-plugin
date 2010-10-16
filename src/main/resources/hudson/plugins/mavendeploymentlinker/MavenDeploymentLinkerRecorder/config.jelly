@@ -1,6 +1,6 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-  <t:summary icon="package.gif">
-    ${%deployments}
-    ${it.text}
-  </t:summary>
+
+  <f:entry title="${%linkRegexp}" field="regexp">
+    <f:textbox field="regexp" />
+  </f:entry>
 </j:jelly>

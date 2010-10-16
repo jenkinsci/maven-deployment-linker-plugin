@@ -18,5 +18,10 @@
       <name>Larry Shatzer, Jr.</name>
       <email>larrys@gmail.com</email>
     </developer>
+    <developer>
+      <id>vlatombe</id>
+      <name>Vincent Latombe</name>
+      <email>vincent.latombe@gmail.com</email>
+    </developer>
   </developers>
 </project>
