@@ -79,7 +79,7 @@ public class MavenDeploymentLinkerRecorder extends Recorder {
     }
     
     @Override
-    public Action getProjectAction(Project project) {
+    public Action getProjectAction(AbstractProject<?, ?> project) {
         return new MavenDeploymentProjectLinkerAction(project);
     }
 

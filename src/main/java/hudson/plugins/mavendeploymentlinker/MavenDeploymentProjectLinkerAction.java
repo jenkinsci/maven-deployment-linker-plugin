@@ -1,15 +1,15 @@
 package hudson.plugins.mavendeploymentlinker;
 
 import hudson.model.Action;
-import hudson.model.Project;
+import hudson.model.AbstractProject;
 import hudson.model.Run;
 
 import org.kohsuke.stapler.export.Exported;
 
 public class MavenDeploymentProjectLinkerAction implements Action {
-    private final Project project;
+    private final AbstractProject<?, ?> project;
 
-    public MavenDeploymentProjectLinkerAction(Project project) {
+    public MavenDeploymentProjectLinkerAction(AbstractProject<?, ?> project) {
         this.project = project;
     }
 
