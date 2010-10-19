@@ -5,6 +5,12 @@
           ${%latestDeployments}
           ${it.latestDeployments.text}
           </t:summary>
+          <j:if test="${it.hasLatestReleaseDeployments()}">
+            <t:summary icon="package.gif">
+            ${%latestReleaseDeployments}
+            ${it.latestReleaseDeployments.text}
+            </t:summary>
+          </j:if>
       </table>
     </j:if>
 </j:jelly>

@@ -2,7 +2,9 @@ package hudson.plugins.mavendeploymentlinker;
 
 import hudson.model.Action;
 import hudson.model.AbstractProject;
+import hudson.model.Result;
 import hudson.model.Run;
+import hudson.util.RunList;
 
 import org.kohsuke.stapler.export.Exported;
 
@@ -37,6 +39,29 @@ public class MavenDeploymentProjectLinkerAction implements Action {
             return null;
         }
         return lastSuccessfulBuild.getAction(MavenDeploymentLinkerAction.class);
+    }
+    
+    @Exported
+    public boolean hasLatestReleaseDeployments() {
+        return getLatestReleaseDeployments() != null;
+    }
+
+    @Exported
+    public Action getLatestReleaseDeployments() {
+        RunList<?> builds = project.getBuilds();
+        for (Run run : builds) {
+            if (isSuccessful(run)) {
+                MavenDeploymentLinkerAction linkerAction = run.getAction(MavenDeploymentLinkerAction.class);
+                if (!linkerAction.isSnapshot()) {
+                    return linkerAction;
+                }
+            }
+        }
+        return null;
+    }
+
+    private boolean isSuccessful(Run run) {
+        return !(run.isBuilding() || run.getResult() == null || run.getResult().isWorseThan(Result.UNSTABLE));
     }
 
 }
