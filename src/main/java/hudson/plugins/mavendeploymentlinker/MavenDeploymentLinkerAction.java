@@ -1,12 +1,11 @@
 package hudson.plugins.mavendeploymentlinker;
 
 import hudson.model.Action;
+import org.kohsuke.stapler.export.Exported;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import org.kohsuke.stapler.export.Exported;
 
 public class MavenDeploymentLinkerAction implements Action {
     private static class ArtifactVersion {
@@ -14,7 +13,12 @@ public class MavenDeploymentLinkerAction implements Action {
         private static final Pattern p = Pattern.compile(SNAPSHOT_PATTERN);
         
         private ArtifactVersion(String url) {
-            this.url = url;
+            // JENKINS-9114 : Remove "dav:" when Maven uses webdav deployment
+            if(url.startsWith("dav:")){
+                this.url = url.substring(4);
+            } else {
+                this.url = url;
+            }
             checkRelease();
         }
         private final String url;
