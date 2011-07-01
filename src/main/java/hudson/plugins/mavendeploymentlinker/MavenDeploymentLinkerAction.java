@@ -1,6 +1,8 @@
 package hudson.plugins.mavendeploymentlinker;
 
 import hudson.model.Action;
+
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.export.Exported;
 
 import java.util.ArrayList;
@@ -13,16 +15,17 @@ public class MavenDeploymentLinkerAction implements Action {
         private static final Pattern p = Pattern.compile(SNAPSHOT_PATTERN);
         
         private ArtifactVersion(String url) {
-            // JENKINS-9114 : Remove "dav:" when Maven uses webdav deployment
-            if(url!=null && url.startsWith("dav:")){
-                this.url = url.substring(4);
-            } else {
-                this.url = url;
-            }
+            this.url = normalize(url);
             checkRelease();
         }
+        
         private final String url;
         private boolean snapshot;
+        
+		private String normalize(String url) {
+			// JENKINS-9114 : Remove "dav:" when Maven uses webdav deployment
+			return StringUtils.removeStart(url, "dav:");
+		}
 
         private void checkRelease() {
             snapshot = p.matcher(url).matches();
