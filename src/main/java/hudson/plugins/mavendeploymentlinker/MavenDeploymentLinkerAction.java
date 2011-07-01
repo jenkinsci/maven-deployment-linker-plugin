@@ -22,10 +22,10 @@ public class MavenDeploymentLinkerAction implements Action {
         private final String url;
         private boolean snapshot;
         
-		private String normalize(String url) {
-			// JENKINS-9114 : Remove "dav:" when Maven uses webdav deployment
-			return StringUtils.removeStart(url, "dav:");
-		}
+        private String normalize(String url) {
+        // JENKINS-9114 : Remove "dav:" when Maven uses webdav deployment
+            return StringUtils.removeStart(url, "dav:");
+        }
 
         private void checkRelease() {
             snapshot = p.matcher(url).matches();
