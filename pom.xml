@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.jvnet.hudson.plugins</groupId>
   <artifactId>maven-deployment-linker</artifactId>
-  <version>1.4</version>
+  <version>1.5-SNAPSHOT</version>
   <packaging>hpi</packaging>
   <name>Maven Deployment Linker</name>
   <url>http://wiki.hudson-ci.org/display/HUDSON/Maven+Deployment+Linker</url>
