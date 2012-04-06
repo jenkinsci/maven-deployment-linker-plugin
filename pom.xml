@@ -29,8 +29,24 @@
     </developer>
     <developer>
       <id>aheritier</id>
-      <name>Arnaud HÃ©ritier</name>
+      <name>Arnaud Hritier</name>
       <email>aheritier@apache.org</email>
     </developer>
   </developers>
-</project>
+
+    <repositories>
+        <repository>
+            <id>repo.jenkins-ci.org</id>
+            <url>http://repo.jenkins-ci.org/public/</url>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>repo.jenkins-ci.org</id>
+            <url>http://repo.jenkins-ci.org/public/</url>
+        </pluginRepository>
+    </pluginRepositories>
+</project>  
+  
+
