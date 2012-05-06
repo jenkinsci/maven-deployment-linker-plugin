@@ -52,7 +52,7 @@ public class MavenDeploymentProjectLinkerAction implements Action {
         for (Run run : builds) {
             if (isSuccessful(run)) {
                 MavenDeploymentLinkerAction linkerAction = run.getAction(MavenDeploymentLinkerAction.class);
-                if (!linkerAction.isSnapshot()) {
+                if (linkerAction != null && !linkerAction.isSnapshot()) {
                     return linkerAction;
                 }
             }
