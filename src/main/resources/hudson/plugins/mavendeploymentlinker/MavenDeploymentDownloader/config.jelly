@@ -1,0 +1,28 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+	<f:entry title="${%Project}" field="projectName">
+		<f:textbox />
+	</f:entry>
+	<f:entry title="${%Permalink}" field="permaLink">
+		<f:select />
+	</f:entry>
+	<f:entry title="${%Artifacts to copy}" field="filePattern">
+		<f:textbox />
+	</f:entry>
+	<f:entry title="${%Target directory}" field="targetDir">
+		<f:textbox />
+	</f:entry>
+	<f:advanced>
+		<f:entry title="${%Fail if no artifact}" field="failIfNoArtifact">
+			<f:checkbox checked="${instance.isFailIfNoArtifact()}" />
+		</f:entry>
+		<f:entry title="${%Clean target directory}" field="cleanTargetDir">
+			<f:checkbox checked="${instance.isCleanTargetDir()}" />
+		</f:entry>
+		<f:entry title="${%Strip version}" field="stripVersion">
+			<f:checkbox checked="${instance.isStripVersion()}" />
+		</f:entry>
+		<f:entry title="${%Version strip pattern}" field="stripVersionPattern">
+			<f:textbox />
+		</f:entry>
+	</f:advanced>
+</j:jelly>

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public class MavenDeploymentLinkerAction implements Action {
-    private static class ArtifactVersion {
+    /*package*/ static class ArtifactVersion {
         private static final String SNAPSHOT_PATTERN = ".*-SNAPSHOT.*";
         private static final Pattern p = Pattern.compile(SNAPSHOT_PATTERN);
         
@@ -32,6 +32,9 @@ public class MavenDeploymentLinkerAction implements Action {
         }
         public boolean isSnapshot() {
             return snapshot;
+        }
+        public String getUrl() {
+            return url;
         }
         public String getText() {
             StringBuilder textBuilder = new StringBuilder();
@@ -88,4 +91,10 @@ public class MavenDeploymentLinkerAction implements Action {
         deployments.add(artifactVersion);
     }
 
+    /**
+     * @return list of all linked deployments
+     */
+    /*package*/ List<ArtifactVersion> getDeployments() {
+        return deployments;
+    }
 }
