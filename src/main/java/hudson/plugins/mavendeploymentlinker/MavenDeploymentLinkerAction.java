@@ -10,13 +10,14 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public class MavenDeploymentLinkerAction implements Action {
+  
     /*package*/ static class ArtifactVersion {
         private static final String SNAPSHOT_PATTERN = ".*-SNAPSHOT.*";
         private static final Pattern p = Pattern.compile(SNAPSHOT_PATTERN);
         
         private ArtifactVersion(String url) {
             this.url = normalize(url);
-            checkRelease();
+            snapshot = p.matcher(url).matches();
         }
         
         private final String url;
@@ -26,10 +27,7 @@ public class MavenDeploymentLinkerAction implements Action {
         // JENKINS-9114 : Remove "dav:" when Maven uses webdav deployment
             return StringUtils.removeStart(url, "dav:");
         }
-
-        private void checkRelease() {
-            snapshot = p.matcher(url).matches();
-        }
+        
         public boolean isSnapshot() {
             return snapshot;
         }
@@ -50,11 +48,12 @@ public class MavenDeploymentLinkerAction implements Action {
     private List<ArtifactVersion> deployments = new ArrayList<ArtifactVersion>();
     
     private transient String text;
-
-    private boolean snapshot = false;
     
-    public boolean isSnapshot() {
-        return snapshot;
+    public boolean isRelease() {
+        for (ArtifactVersion artifactVersion : deployments) {
+          if (!artifactVersion.isSnapshot()) return true;
+        }
+        return false;
     }
 
     public String getIconFileName() {
@@ -85,9 +84,6 @@ public class MavenDeploymentLinkerAction implements Action {
 
     public void addDeployment(String url) {
         ArtifactVersion artifactVersion = new ArtifactVersion(url);
-        if (artifactVersion.isSnapshot()) {
-            snapshot = true;
-        }
         deployments.add(artifactVersion);
     }
 
