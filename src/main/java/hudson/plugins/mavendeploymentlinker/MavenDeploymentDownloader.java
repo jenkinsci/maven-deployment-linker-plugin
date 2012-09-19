@@ -35,6 +35,8 @@ import java.util.regex.PatternSyntaxException;
 import javax.servlet.ServletException;
 
 import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.plugins.tokenmacro.MacroEvaluationException;
+import org.jenkinsci.plugins.tokenmacro.TokenMacro;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -86,12 +88,14 @@ public class MavenDeploymentDownloader extends Builder {
     public MavenDeploymentDownloader(String projectName, String filePattern, String permaLink, String targetDir, boolean stripVersion,
             String stripVersionPattern, boolean failIfNoArtifact, boolean cleanTargetDir) {
         // check the permissions only if we can
-        StaplerRequest req = Stapler.getCurrentRequest();
-        if (req != null) {
-            // Prevents both invalid values and access to artifacts of projects which this user cannot see.
-            // If value is parameterized, it will be checked when build runs.
-            if (Hudson.getInstance().getItemByFullName(projectName, Job.class) == null) {
-                projectName = ""; // Ignore/clear bad value to avoid ugly 500 page
+        if(!projectName.startsWith("$")){ // if this is a parameter, we can't check the name here it will be expanded by the TokenMacro...
+            StaplerRequest req = Stapler.getCurrentRequest();
+            if (req != null) {
+                // Prevents both invalid values and access to artifacts of projects which this user cannot see.
+                // If value is parameterized, it will be checked when build runs.
+                if (Hudson.getInstance().getItemByFullName(projectName, Job.class) == null) {
+                    projectName = ""; // Ignore/clear bad value to avoid ugly 500 page
+                }
             }
         }
         this.projectName = projectName;
@@ -147,7 +151,21 @@ public class MavenDeploymentDownloader extends Builder {
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
 
         final PrintStream console = listener.getLogger();
-        final Job<?, ?> job = Hudson.getInstance().getItemByFullName(projectName, Job.class);
+        
+        String resolvedProjectName = null;
+        try {
+            resolvedProjectName = TokenMacro.expandAll( build, listener, projectName );
+        } catch (MacroEvaluationException e1) {
+            console.println(Messages.jobNameExandFailed()+": "+e1.getMessage());
+            return false;
+        }
+        
+        if(StringUtils.isBlank(resolvedProjectName)){
+            console.println(Messages.noJobName());
+            return false;
+        }
+        
+        final Job<?, ?> job = Hudson.getInstance().getItemByFullName(resolvedProjectName, Job.class);
 
         FilePath targetDirFp = new FilePath(build.getWorkspace(), targetDir);
         if (cleanTargetDir) {
@@ -162,10 +180,10 @@ public class MavenDeploymentDownloader extends Builder {
 
                 {
                     // do some hyper linked logging
-                    final String jobUrl = Hudson.getInstance().getRootUrl() + "job/" + projectName;
+                    final String jobUrl = Hudson.getInstance().getRootUrl() + "job/" + resolvedProjectName;
                     final String linkBuildNr = HyperlinkNote.encodeTo(jobUrl + "/" + resolvedJob.number, "#" + resolvedJob.number);
                     final String linkPerma = HyperlinkNote.encodeTo(jobUrl + "/" + link.getId(), link.getDisplayName());
-                    final String linkJob = HyperlinkNote.encodeTo(jobUrl, projectName);
+                    final String linkJob = HyperlinkNote.encodeTo(jobUrl, resolvedProjectName);
                     console.println(Messages.resolveArtifact(linkBuildNr, linkPerma, linkJob));
                 }
             }
