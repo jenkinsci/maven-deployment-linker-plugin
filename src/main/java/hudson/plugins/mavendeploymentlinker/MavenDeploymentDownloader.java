@@ -3,7 +3,6 @@ package hudson.plugins.mavendeploymentlinker;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
-import hudson.RelativePath;
 import hudson.Util;
 import hudson.console.HyperlinkNote;
 import hudson.model.AutoCompletionCandidates;
@@ -265,7 +264,7 @@ public class MavenDeploymentDownloader extends Builder {
             return c;
         }
 
-        public ListBoxModel doFillPermaLinkItems(@AncestorInPath Job<?, ?> defaultJob, @RelativePath("..") @QueryParameter("projectName") String projectName) {
+        public ListBoxModel doFillPermaLinkItems(@AncestorInPath Job<?, ?> defaultJob, @QueryParameter("projectName") String projectName) {
             // gracefully fall back to some job, if none is given
             Job<?, ?> j = null;
             if (projectName != null)
