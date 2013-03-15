@@ -49,6 +49,9 @@ public class MavenDeploymentLinkerAction implements Action {
     
     private transient String text;
     
+    @Deprecated
+    private transient boolean snapshot;
+    
     public boolean isRelease() {
         for (ArtifactVersion artifactVersion : deployments) {
           if (!artifactVersion.isSnapshot()) return true;
