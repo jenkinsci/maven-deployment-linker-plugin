@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -68,7 +69,7 @@ public class MavenDeploymentLinkerRecorder extends Recorder implements SimpleBui
             }
         }
         if (matches.size() > 0) {
-            MavenDeploymentLinkerAction action = new MavenDeploymentLinkerAction();
+            MavenDeploymentLinkerAction action = new MavenDeploymentLinkerAction(build);
             for (String url : matches) {
                 action.addDeployment(url);
             }
@@ -78,11 +79,6 @@ public class MavenDeploymentLinkerRecorder extends Recorder implements SimpleBui
         return;
     }
     
-    @Override
-    public Action getProjectAction(AbstractProject<?, ?> project) {
-        return new MavenDeploymentProjectLinkerAction(project);
-    }
-
     @Extension
     public static class DescriptorImpl extends BuildStepDescriptor<Publisher> {
 
