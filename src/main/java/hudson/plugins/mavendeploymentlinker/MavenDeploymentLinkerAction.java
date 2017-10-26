@@ -4,13 +4,13 @@ import hudson.model.Action;
 import hudson.model.Run;
 import jenkins.tasks.SimpleBuildStep;
 
-import org.apache.commons.lang.StringUtils;
-import org.kohsuke.stapler.export.Exported;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang.StringUtils;
+import org.kohsuke.stapler.export.Exported;
 
 public class MavenDeploymentLinkerAction implements Action, SimpleBuildStep.LastBuildAction {
 

@@ -5,14 +5,8 @@ import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Util;
 import hudson.console.HyperlinkNote;
-import hudson.model.AutoCompletionCandidates;
-import hudson.model.BuildListener;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
-import hudson.model.Hudson;
-import hudson.model.Job;
+import hudson.model.*;
 import hudson.model.PermalinkProjectAction.Permalink;
-import hudson.model.Run;
 import hudson.plugins.mavendeploymentlinker.MavenDeploymentLinkerAction.ArtifactVersion;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
@@ -21,6 +15,7 @@ import hudson.util.IOUtils;
 import hudson.util.ListBoxModel;
 import hudson.util.ListBoxModel.Option;
 
+import javax.servlet.ServletException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -31,17 +26,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import javax.servlet.ServletException;
-
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.tokenmacro.MacroEvaluationException;
 import org.jenkinsci.plugins.tokenmacro.TokenMacro;
-import org.kohsuke.stapler.AncestorInPath;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.Stapler;
-import org.kohsuke.stapler.StaplerRequest;
-
+import org.kohsuke.stapler.*;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Response;
 
