@@ -1,17 +1,16 @@
 package hudson.plugins.mavendeploymentlinker;
 
 import hudson.Extension;
+import hudson.FilePath;
 import hudson.Launcher;
-import hudson.model.Action;
-import hudson.model.BuildListener;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
-import hudson.model.Project;
+import hudson.model.*;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
+import jenkins.tasks.SimpleBuildStep;
 
+import javax.annotation.Nonnull;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -24,7 +23,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-public class MavenDeploymentLinkerRecorder extends Recorder {
+public class MavenDeploymentLinkerRecorder extends Recorder implements SimpleBuildStep {
     
     private static final String IGNORED_RESOURCES="^.*maven-metadata.xml$";
     
@@ -48,7 +47,8 @@ public class MavenDeploymentLinkerRecorder extends Recorder {
     }
 
     @Override
-    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
+    public void perform(@Nonnull Run<?, ?> build, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull
+            TaskListener listener) throws InterruptedException, IOException {
         File logFile = build.getLogFile();
         BufferedReader in = new BufferedReader(new FileReader(logFile));
         Pattern pattern = Pattern.compile("^.*?Uploading: (.*?)$");
@@ -72,10 +72,10 @@ public class MavenDeploymentLinkerRecorder extends Recorder {
             for (String url : matches) {
                 action.addDeployment(url);
             }
-            build.getActions().add(action);
+            build.addAction(action);
             build.save();
         }
-        return true;
+        return;
     }
     
     @Override

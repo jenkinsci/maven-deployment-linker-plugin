@@ -2,6 +2,10 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
   <t:summary icon="package.gif">
     ${%deployments}
-    ${it.text}
+    <ul>
+    <j:forEach var="item" items="${it.deployments}">
+      <li><a href="${item.getUrl()}">${item.getArtifactName()}</a></li>
+    </j:forEach>
+    </ul>
   </t:summary>
 </j:jelly>
