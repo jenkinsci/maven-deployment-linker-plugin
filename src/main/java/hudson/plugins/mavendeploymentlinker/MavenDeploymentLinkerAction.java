@@ -1,39 +1,61 @@
 package hudson.plugins.mavendeploymentlinker;
 
 import hudson.model.Action;
+import hudson.model.Run;
+import jenkins.tasks.SimpleBuildStep;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.export.Exported;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
+public class MavenDeploymentLinkerAction implements Action, SimpleBuildStep.LastBuildAction {
 
-public class MavenDeploymentLinkerAction implements Action {
-  
-    /*package*/ static class ArtifactVersion {
+    private List<MavenDeploymentProjectLinkerAction> projectActions;
+
+    public MavenDeploymentLinkerAction(Run<?,?> build) {
+        List<MavenDeploymentProjectLinkerAction> projectActions = new ArrayList<>();
+        projectActions.add(new MavenDeploymentProjectLinkerAction(build.getParent()));
+        this.projectActions = projectActions;
+    }
+
+    public static class ArtifactVersion {
         private static final String SNAPSHOT_PATTERN = ".*-SNAPSHOT.*";
         private static final Pattern p = Pattern.compile(SNAPSHOT_PATTERN);
-        
+
         private ArtifactVersion(String url) {
             this.url = normalize(url);
             snapshot = p.matcher(url).matches();
         }
-        
+
         private final String url;
         private boolean snapshot;
-        
+
         private String normalize(String url) {
         // JENKINS-9114 : Remove "dav:" when Maven uses webdav deployment
             return StringUtils.removeStart(url, "dav:");
         }
-        
+
         public boolean isSnapshot() {
             return snapshot;
         }
+
         public String getUrl() {
             return url;
         }
+
+
+        public String getArtifactName() {
+            return url.substring(url.lastIndexOf('/') + 1, url.length());
+        }
+
+        /**
+         * @deprecated use {@link #getUrl} and {@link #getArtifactName()} instead.
+         */
+        @Deprecated
         public String getText() {
             StringBuilder textBuilder = new StringBuilder();
             textBuilder.append("\n<li>");
@@ -44,14 +66,14 @@ public class MavenDeploymentLinkerAction implements Action {
             return textBuilder.toString();
         }
     }
-    
+
     private List<ArtifactVersion> deployments = new ArrayList<ArtifactVersion>();
-    
+
     private transient String text;
-    
+
     @Deprecated
     private transient boolean snapshot;
-    
+
     public boolean isRelease() {
         for (ArtifactVersion artifactVersion : deployments) {
           if (!artifactVersion.isSnapshot()) return true;
@@ -71,6 +93,10 @@ public class MavenDeploymentLinkerAction implements Action {
         return "";
     }
 
+    /**
+     * @deprecated use {@link #getDeployments()} instead.
+     */
+    @Deprecated
     @Exported
     public String getText() {
         if (text == null) {
@@ -91,9 +117,14 @@ public class MavenDeploymentLinkerAction implements Action {
     }
 
     /**
-     * @return list of all linked deployments
+     * @return list of all linked deployments.
      */
-    /*package*/ List<ArtifactVersion> getDeployments() {
+    public List<ArtifactVersion> getDeployments() {
         return deployments;
+    }
+
+    @Override
+    public Collection<? extends Action> getProjectActions() {
+        return this.projectActions;
     }
 }

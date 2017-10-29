@@ -3,23 +3,37 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.jvnet.hudson.plugins</groupId>
 	<artifactId>maven-deployment-linker</artifactId>
-	<version>1.6-SNAPSHOT</version>
+	<version>2.0-SNAPSHOT</version>
 	<packaging>hpi</packaging>
 	<name>Maven Deployment Linker</name>
-	<url>http://wiki.hudson-ci.org/display/HUDSON/Maven+Deployment+Linker</url>
+	<url>https://plugins.jenkins.io/${project.artifactId}</url>
 	<scm>
-		<connection>scm:git:https://github.com/jenkinsci/maven-deployment-linker-plugin.git</connection>
-		<developerConnection>scm:git:https://github.com/jenkinsci/maven-deployment-linker-plugin.git</developerConnection>
-		<url>https://github.com/jenkinsci/favorite-plugin</url>
+		<connection>scm:git:https://github.com/jenkinsci/${project.artifactId}-plugin.git</connection>
+		<developerConnection>scm:git:https://github.com/jenkinsci/${project.artifactId}-plugin.git</developerConnection>
+		<url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
 	</scm>
 	<parent>
 		<groupId>org.jenkins-ci.plugins</groupId>
 		<artifactId>plugin</artifactId>
-		<version>1.420</version>
+		<version>2.4</version>
 	</parent>
+
 	<properties>
 	   <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Baseline Jenkins version you use to build the plugin. Users must have this version or newer to run. -->
+       <jenkins.version>1.642.3</jenkins.version>
+        <!-- Java Level to use. Java 7 required when using core >= 1.612 -->
+        <java.level>7</java.level>
+        <!-- Jenkins Test Harness version you use to test the plugin. -->
+        <!-- For Jenkins version >= 1.580.1 use JTH 2.x or higher. -->
+
+        <!-- Other properties you may want to use:
+      ~ hpi-plugin.version: The HPI Maven Plugin version used by the plugin..
+      ~ stapler-plugin.version: The Stapler Maven plugin version required by the plugin.
+        -->
+        <workflow-plugins.version>1.15</workflow-plugins.version>
 	</properties>
+
 	<developers>
 		<developer>
 			<id>lshatzer</id>
@@ -67,15 +81,89 @@
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>token-macro</artifactId>
             <version>1.5.1</version>
-        </dependency>		
+        </dependency>
+
+        <!-- dependencies on Jenkins Pipeline plugins -->
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-step-api</artifactId>
+            <version>${workflow-plugins.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-job</artifactId>
+            <version>${workflow-plugins.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-cps</artifactId>
+            <version>${workflow-plugins.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-basic-steps</artifactId>
+            <version>${workflow-plugins.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-durable-task-step</artifactId>
+            <version>${workflow-plugins.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-support</artifactId>
+            <version>${workflow-plugins.version}</version>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>git</artifactId>
+            <version>2.4.1</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpclient</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 	</dependencies>
+
     <build>
         <plugins>
             <plugin>
                 <groupId>org.jenkins-ci.tools</groupId>
                 <artifactId>maven-hpi-plugin</artifactId>
-                <version>1.90</version>
                 <extensions>true</extensions>
+                <configuration>
+                    <loggers>
+                        <org.jenkinsci.plugins.workflow>FINE</org.jenkinsci.plugins.workflow>
+                        <org.jenkinsci.plugins.durabletask>FINE</org.jenkinsci.plugins.durabletask>
+                    </loggers>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!-- TODO remove as soon as javadoc was completed -->
+                    <failOnError>false</failOnError>
+                </configuration>
             </plugin>
         </plugins>
         <pluginManagement>

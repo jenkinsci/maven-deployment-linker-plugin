@@ -5,22 +5,17 @@ import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Util;
 import hudson.console.HyperlinkNote;
-import hudson.model.AutoCompletionCandidates;
-import hudson.model.BuildListener;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
-import hudson.model.Hudson;
-import hudson.model.Job;
+import hudson.model.*;
 import hudson.model.PermalinkProjectAction.Permalink;
-import hudson.model.Run;
 import hudson.plugins.mavendeploymentlinker.MavenDeploymentLinkerAction.ArtifactVersion;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
-import hudson.util.IOUtils;
 import hudson.util.ListBoxModel;
 import hudson.util.ListBoxModel.Option;
+import jenkins.model.Jenkins;
 
+import javax.servlet.ServletException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -31,17 +26,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import javax.servlet.ServletException;
-
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.tokenmacro.MacroEvaluationException;
 import org.jenkinsci.plugins.tokenmacro.TokenMacro;
-import org.kohsuke.stapler.AncestorInPath;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.Stapler;
-import org.kohsuke.stapler.StaplerRequest;
-
+import org.kohsuke.stapler.*;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Response;
 
@@ -92,7 +81,7 @@ public class MavenDeploymentDownloader extends Builder {
             if (req != null) {
                 // Prevents both invalid values and access to artifacts of projects which this user cannot see.
                 // If value is parameterized, it will be checked when build runs.
-                if (Hudson.getInstance().getItemByFullName(projectName, Job.class) == null) {
+                if (Jenkins.getInstance().getItemByFullName(projectName, Job.class) == null) {
                     projectName = ""; // Ignore/clear bad value to avoid ugly 500 page
                 }
             }
@@ -164,7 +153,7 @@ public class MavenDeploymentDownloader extends Builder {
             return false;
         }
         
-        final Job<?, ?> job = Hudson.getInstance().getItemByFullName(resolvedProjectName, Job.class);
+        final Job<?, ?> job = Jenkins.getInstance().getItemByFullName(resolvedProjectName, Job.class);
 
         FilePath targetDirFp = new FilePath(build.getWorkspace(), targetDir);
         if (cleanTargetDir) {
@@ -179,7 +168,7 @@ public class MavenDeploymentDownloader extends Builder {
 
                 {
                     // do some hyper linked logging
-                    final String jobUrl = Hudson.getInstance().getRootUrl() + "job/" + resolvedProjectName;
+                    final String jobUrl = Jenkins.getInstance().getRootUrl() + "job/" + resolvedProjectName;
                     final String linkBuildNr = HyperlinkNote.encodeTo(jobUrl + "/" + resolvedJob.number, "#" + resolvedJob.number);
                     final String linkPerma = HyperlinkNote.encodeTo(jobUrl + "/" + link.getId(), link.getDisplayName());
                     final String linkJob = HyperlinkNote.encodeTo(jobUrl, resolvedProjectName);
@@ -256,7 +245,7 @@ public class MavenDeploymentDownloader extends Builder {
     public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
 
         public AutoCompletionCandidates doAutoCompleteProjectName(@QueryParameter String value) {
-            final List<Job> jobs = Hudson.getInstance().getItems(Job.class);
+            final List<Job> jobs = Jenkins.getInstance().getItems(Job.class);
             AutoCompletionCandidates c = new AutoCompletionCandidates();
             for (Job<?, ?> job : jobs)
                 if (job.getName().toLowerCase().startsWith(value.toLowerCase()))
@@ -268,7 +257,7 @@ public class MavenDeploymentDownloader extends Builder {
             // gracefully fall back to some job, if none is given
             Job<?, ?> j = null;
             if (projectName != null)
-                j = Hudson.getInstance().getItem(projectName, defaultJob, Job.class);
+                j = Jenkins.getInstance().getItem(projectName, defaultJob, Job.class);
             if (j == null)
                 j = defaultJob;
 

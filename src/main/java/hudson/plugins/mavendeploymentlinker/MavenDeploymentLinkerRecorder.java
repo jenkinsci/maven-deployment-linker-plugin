@@ -1,21 +1,19 @@
 package hudson.plugins.mavendeploymentlinker;
 
 import hudson.Extension;
+import hudson.FilePath;
 import hudson.Launcher;
-import hudson.model.Action;
-import hudson.model.BuildListener;
-import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
-import hudson.model.Project;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
+import jenkins.tasks.SimpleBuildStep;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import javax.annotation.Nonnull;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -24,15 +22,18 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-public class MavenDeploymentLinkerRecorder extends Recorder {
+public class MavenDeploymentLinkerRecorder extends Recorder implements SimpleBuildStep {
     
     private static final String IGNORED_RESOURCES="^.*maven-metadata.xml$";
     
     private String regexp;
+
+    private PrintStream logger;
     
     @DataBoundConstructor
-    public MavenDeploymentLinkerRecorder(final String regexp) {
+    public MavenDeploymentLinkerRecorder(final String regexp, TaskListener listener) {
         this.regexp = StringUtils.trimToEmpty(regexp);
+        this.logger = listener.getLogger();
     }
 
     public String getRegexp() {
@@ -48,9 +49,10 @@ public class MavenDeploymentLinkerRecorder extends Recorder {
     }
 
     @Override
-    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
-        File logFile = build.getLogFile();
-        BufferedReader in = new BufferedReader(new FileReader(logFile));
+    public void perform(@Nonnull Run<?, ?> build, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull
+            TaskListener listener) throws InterruptedException, IOException {
+        Reader logReader = build.getLogReader();
+        BufferedReader in = new BufferedReader(logReader);
         Pattern pattern = Pattern.compile("^.*?Uploading: (.*?)$");
         Pattern filterPattern = Pattern.compile(StringUtils.isNotBlank(regexp) ? regexp : ".*");
         Pattern ignoredPattern = Pattern.compile(IGNORED_RESOURCES);
@@ -68,21 +70,19 @@ public class MavenDeploymentLinkerRecorder extends Recorder {
             }
         }
         if (matches.size() > 0) {
-            MavenDeploymentLinkerAction action = new MavenDeploymentLinkerAction();
+            MavenDeploymentLinkerAction action = new MavenDeploymentLinkerAction(build);
+            logger.println(matches.size() + " Maven Deployment Links where found.");
             for (String url : matches) {
                 action.addDeployment(url);
             }
-            build.getActions().add(action);
+            build.addAction(action);
             build.save();
+        } else {
+            logger.println("No Maven Deployment Links where found.");
         }
-        return true;
+        return;
     }
     
-    @Override
-    public Action getProjectAction(AbstractProject<?, ?> project) {
-        return new MavenDeploymentProjectLinkerAction(project);
-    }
-
     @Extension
     public static class DescriptorImpl extends BuildStepDescriptor<Publisher> {
 
