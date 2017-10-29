@@ -15,6 +15,8 @@ import org.jenkinsci.plugins.workflow.steps.StepContextParameter;
  */
 public class MavenDeploymentLinkerStepExecution extends AbstractSynchronousNonBlockingStepExecution<Void> {
 
+    private static final long serialVersionUID = 1L;
+
     @StepContextParameter
     private transient TaskListener listener;
 
@@ -34,7 +36,7 @@ public class MavenDeploymentLinkerStepExecution extends AbstractSynchronousNonBl
     protected Void run() throws Exception {
         listener.getLogger().println("Recording Maven Deployment Links ...");
 
-        MavenDeploymentLinkerRecorder recorder = new MavenDeploymentLinkerRecorder(mavenDeploymentLinkerStep.getRegexp());
+        MavenDeploymentLinkerRecorder recorder = new MavenDeploymentLinkerRecorder(mavenDeploymentLinkerStep.getRegexp(), listener);
         recorder.perform(build, ws, launcher, listener);
 
         return null;

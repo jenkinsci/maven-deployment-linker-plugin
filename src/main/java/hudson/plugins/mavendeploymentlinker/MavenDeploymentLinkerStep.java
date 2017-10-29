@@ -5,6 +5,8 @@ import hudson.Util;
 
 import javax.annotation.Nonnull;
 
+import java.io.Serializable;
+
 import org.jenkinsci.plugins.workflow.steps.AbstractStepDescriptorImpl;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepImpl;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -13,7 +15,9 @@ import org.kohsuke.stapler.DataBoundSetter;
 /**
  * @author Matthias Balke <matthias.balke@googlemail.com>
  */
-public class MavenDeploymentLinkerStep extends AbstractStepImpl {
+public class MavenDeploymentLinkerStep extends AbstractStepImpl implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private String regexp;
 

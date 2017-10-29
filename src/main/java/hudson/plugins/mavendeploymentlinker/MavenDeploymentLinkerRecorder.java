@@ -13,10 +13,7 @@ import hudson.tasks.Recorder;
 import jenkins.tasks.SimpleBuildStep;
 
 import javax.annotation.Nonnull;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -30,10 +27,13 @@ public class MavenDeploymentLinkerRecorder extends Recorder implements SimpleBui
     private static final String IGNORED_RESOURCES="^.*maven-metadata.xml$";
     
     private String regexp;
+
+    private PrintStream logger;
     
     @DataBoundConstructor
-    public MavenDeploymentLinkerRecorder(final String regexp) {
+    public MavenDeploymentLinkerRecorder(final String regexp, TaskListener listener) {
         this.regexp = StringUtils.trimToEmpty(regexp);
+        this.logger = listener.getLogger();
     }
 
     public String getRegexp() {
@@ -51,8 +51,8 @@ public class MavenDeploymentLinkerRecorder extends Recorder implements SimpleBui
     @Override
     public void perform(@Nonnull Run<?, ?> build, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull
             TaskListener listener) throws InterruptedException, IOException {
-        File logFile = build.getLogFile();
-        BufferedReader in = new BufferedReader(new FileReader(logFile));
+        Reader logReader = build.getLogReader();
+        BufferedReader in = new BufferedReader(logReader);
         Pattern pattern = Pattern.compile("^.*?Uploading: (.*?)$");
         Pattern filterPattern = Pattern.compile(StringUtils.isNotBlank(regexp) ? regexp : ".*");
         Pattern ignoredPattern = Pattern.compile(IGNORED_RESOURCES);
@@ -71,11 +71,14 @@ public class MavenDeploymentLinkerRecorder extends Recorder implements SimpleBui
         }
         if (matches.size() > 0) {
             MavenDeploymentLinkerAction action = new MavenDeploymentLinkerAction(build);
+            logger.println(matches.size() + " Maven Deployment Links where found.");
             for (String url : matches) {
                 action.addDeployment(url);
             }
             build.addAction(action);
             build.save();
+        } else {
+            logger.println("No Maven Deployment Links where found.");
         }
         return;
     }
