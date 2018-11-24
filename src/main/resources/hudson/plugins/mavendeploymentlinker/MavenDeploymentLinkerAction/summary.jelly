@@ -1,6 +1,11 @@
+<?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
   <t:summary icon="package.gif">
     ${%deployments}
-    ${it.text}
+    <ul>
+    <j:forEach items="${it.deployments}" var="deployment">
+        <li><a href="${deployment.url}">${deployment.name}</a></li>
+    </j:forEach>
+    </ul>
   </t:summary>
 </j:jelly>

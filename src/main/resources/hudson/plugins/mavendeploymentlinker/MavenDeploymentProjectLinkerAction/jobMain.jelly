@@ -1,14 +1,24 @@
+<?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
     <j:if test="${it.hasLatestDeployments()}">
       <table style="margin-top: 1em; margin-left:1em;">
           <t:summary icon="package.gif">
           ${%latestDeployments}
-          ${it.latestDeployments.text}
+          <ul>
+          <j:forEach items="${it.latestDeployments.deployments}" var="deployment">
+              <li><a href="${deployment.url}">${deployment.name}</a></li>
+          </j:forEach>
+          </ul>
+          <j:out value="${it.latestDeployments.text}"/>
           </t:summary>
           <j:if test="${it.hasLatestReleaseDeployments()}">
             <t:summary icon="package.gif">
             ${%latestReleaseDeployments}
-            ${it.latestReleaseDeployments.text}
+            <ul>
+            <j:forEach items="${it.latestReleaseDeployments.deployments}" var="deployment">
+                <li><a href="${deployment.url}">${deployment.name}</a></li>
+            </j:forEach>
+            </ul>
             </t:summary>
           </j:if>
       </table>
